@@ -1,0 +1,14 @@
+{
+  "createrecipepicker.gui.title": "Recipe Picker",
+  "createrecipepicker.gui.empty": "No recipe conflicts detected",
+  "createrecipepicker.gui.no_matches": "No matches",
+  "createrecipepicker.gui.search_hint": "Search items...",
+  "createrecipepicker.gui.filter.crushing": "Crush",
+  "createrecipepicker.gui.filter.milling": "Mill",
+  "createrecipepicker.gui.filter.haunting": "Haunt",
+  "createrecipepicker.gui.filter.splashing": "Splash",
+  "createrecipepicker.gui.subtitle.one": "%d conflict",
+  "createrecipepicker.gui.subtitle.other": "%d conflicts",
+  "createrecipepicker.gui.subtitle.filtered": "%d / %d",
+  "createrecipepicker.error.not_op": "Recipe Picker: only operators can change preferences on this server"
+}

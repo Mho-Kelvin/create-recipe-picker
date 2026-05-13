@@ -64,13 +64,13 @@ public class RecipePickerScreen extends Screen {
     private static final int TOGGLE_W = 32;
     private static final int TOGGLE_GAP = 2;
 
-    private record TypeFilter(String label, ResourceLocation typeId) {}
+    private record TypeFilter(String labelKey, ResourceLocation typeId) {}
 
     private static final List<TypeFilter> TYPE_FILTERS = List.of(
-            new TypeFilter("Crush", new ResourceLocation("create:crushing")),
-            new TypeFilter("Mill", new ResourceLocation("create:milling")),
-            new TypeFilter("Haunt", new ResourceLocation("create:haunting")),
-            new TypeFilter("Splash", new ResourceLocation("create:splashing")));
+            new TypeFilter("createrecipepicker.gui.filter.crushing", new ResourceLocation("create:crushing")),
+            new TypeFilter("createrecipepicker.gui.filter.milling", new ResourceLocation("create:milling")),
+            new TypeFilter("createrecipepicker.gui.filter.haunting", new ResourceLocation("create:haunting")),
+            new TypeFilter("createrecipepicker.gui.filter.splashing", new ResourceLocation("create:splashing")));
 
     private final List<ConflictScanner.Conflict> allConflicts;
     private final Set<ResourceLocation> activeTypes;
@@ -82,7 +82,7 @@ public class RecipePickerScreen extends Screen {
     private int contentHeight = 0;
 
     public RecipePickerScreen() {
-        super(Component.literal("Recipe Picker"));
+        super(Component.translatable("createrecipepicker.gui.title"));
         this.allConflicts = ConflictScanner.get();
         this.activeTypes = new LinkedHashSet<>();
         for (TypeFilter f : TYPE_FILTERS) activeTypes.add(f.typeId());
@@ -103,7 +103,7 @@ public class RecipePickerScreen extends Screen {
         searchBox.setMaxLength(48);
         searchBox.setBordered(true);
         searchBox.setResponder(s -> recomputeFiltered());
-        searchBox.setHint(Component.literal("Search items...").withStyle(ChatFormatting.DARK_GRAY));
+        searchBox.setHint(Component.translatable("createrecipepicker.gui.search_hint").withStyle(ChatFormatting.DARK_GRAY));
         addRenderableWidget(searchBox);
 
         recomputeFiltered();
@@ -150,10 +150,17 @@ public class RecipePickerScreen extends Screen {
         renderPanel(g, guiLeft, guiTop, WINDOW_W, WINDOW_H);
 
         g.drawString(font, getTitle(), guiLeft + 8, guiTop + HEADER_TITLE_Y, TEXT_BRASS, false);
-        String subtitle = filteredConflicts.size() == allConflicts.size()
-                ? allConflicts.size() + " conflict" + (allConflicts.size() == 1 ? "" : "s")
-                : filteredConflicts.size() + " / " + allConflicts.size();
-        g.drawString(font, Component.literal(subtitle).withStyle(ChatFormatting.GRAY),
+        Component subtitle;
+        if (filteredConflicts.size() == allConflicts.size()) {
+            String key = allConflicts.size() == 1
+                    ? "createrecipepicker.gui.subtitle.one"
+                    : "createrecipepicker.gui.subtitle.other";
+            subtitle = Component.translatable(key, allConflicts.size()).withStyle(ChatFormatting.GRAY);
+        } else {
+            subtitle = Component.translatable("createrecipepicker.gui.subtitle.filtered",
+                    filteredConflicts.size(), allConflicts.size()).withStyle(ChatFormatting.GRAY);
+        }
+        g.drawString(font, subtitle,
                 guiLeft + WINDOW_W - 8 - font.width(subtitle), guiTop + HEADER_TITLE_Y, TEXT_DIM, false);
 
         renderTypeToggles(g, mouseX, mouseY);
@@ -165,7 +172,10 @@ public class RecipePickerScreen extends Screen {
         g.enableScissor(listX, listY, listX + listW, listY + listH);
 
         if (filteredConflicts.isEmpty()) {
-            String hint = allConflicts.isEmpty() ? "No recipe conflicts detected" : "No matches";
+            String key = allConflicts.isEmpty()
+                    ? "createrecipepicker.gui.empty"
+                    : "createrecipepicker.gui.no_matches";
+            Component hint = Component.translatable(key);
             g.drawString(font, hint,
                     listX + listW / 2 - font.width(hint) / 2,
                     listY + listH / 2 - 4, TEXT_DIM, false);
@@ -203,8 +213,9 @@ public class RecipePickerScreen extends Screen {
             int bg = active ? TOGGLE_ACTIVE : TOGGLE_INACTIVE;
             if (hovered) bg = active ? BORDER_TOP : 0xb0_3a2a14;
             g.fill(tx, ty, tx + TOGGLE_W, ty + FILTER_ROW_H, bg);
-            int textX = tx + TOGGLE_W / 2 - font.width(f.label()) / 2;
-            g.drawString(font, f.label(), textX, ty + 4,
+            Component label = Component.translatable(f.labelKey());
+            int textX = tx + TOGGLE_W / 2 - font.width(label) / 2;
+            g.drawString(font, label, textX, ty + 4,
                     active ? 0xffffffff : TEXT_DIM, false);
         }
     }

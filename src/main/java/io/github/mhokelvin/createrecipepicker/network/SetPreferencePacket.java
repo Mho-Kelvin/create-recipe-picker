@@ -35,8 +35,7 @@ public record SetPreferencePacket(
             ServerPlayer sender = ctx.getSender();
             if (sender == null) return;
             if (!sender.server.isSingleplayer() && !sender.hasPermissions(2)) {
-                sender.sendSystemMessage(Component.literal(
-                        "Recipe Picker: only operators can change preferences on this server")
+                sender.sendSystemMessage(Component.translatable("createrecipepicker.error.not_op")
                         .withStyle(ChatFormatting.RED));
                 return;
             }
