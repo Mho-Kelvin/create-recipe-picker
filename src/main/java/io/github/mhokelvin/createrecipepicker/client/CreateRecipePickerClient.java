@@ -3,7 +3,6 @@ package io.github.mhokelvin.createrecipepicker.client;
 import io.github.mhokelvin.createrecipepicker.CreateRecipePicker;
 import io.github.mhokelvin.createrecipepicker.client.gui.RecipePickerScreen;
 import com.mojang.brigadier.CommandDispatcher;
-import com.mojang.brigadier.tree.LiteralCommandNode;
 import net.minecraft.client.Minecraft;
 import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.commands.Commands;
@@ -26,12 +25,11 @@ public final class CreateRecipePickerClient {
     @SubscribeEvent
     public static void onRegisterClientCommands(RegisterClientCommandsEvent event) {
         CommandDispatcher<CommandSourceStack> dispatcher = event.getDispatcher();
-        LiteralCommandNode<CommandSourceStack> main = dispatcher.register(
+        dispatcher.register(
                 Commands.literal("createrecipepicker")
                         .executes(ctx -> {
                             Minecraft.getInstance().setScreen(new RecipePickerScreen());
                             return 1;
                         }));
-        dispatcher.register(Commands.literal("crp").redirect(main));
     }
 }

@@ -2,7 +2,9 @@ package io.github.mhokelvin.createrecipepicker.network;
 
 import io.github.mhokelvin.createrecipepicker.CreateRecipePicker;
 import io.github.mhokelvin.createrecipepicker.RecipePickerState;
+import net.minecraft.ChatFormatting;
 import net.minecraft.network.FriendlyByteBuf;
+import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraftforge.network.NetworkEvent;
@@ -32,10 +34,12 @@ public record SetPreferencePacket(
         ctx.enqueueWork(() -> {
             ServerPlayer sender = ctx.getSender();
             if (sender == null) return;
-            // Permission check deliberately absent — single-player without cheats has
-            // permission level 0, so an OP gate would lock the mod out of its primary
-            // use case. A proper server-config knob (anyone / ops_only / creative_only)
-            // is tracked in the project's HANDOFF / memory.
+            if (!sender.server.isSingleplayer() && !sender.hasPermissions(2)) {
+                sender.sendSystemMessage(Component.literal(
+                        "Recipe Picker: only operators can change preferences on this server")
+                        .withStyle(ChatFormatting.RED));
+                return;
+            }
             RecipePickerState state = RecipePickerState.get(sender.server.overworld());
             state.setPreference(pkt.typeId, pkt.inputItemId, pkt.recipeId);
             CreateRecipePicker.LOGGER.info("[{}] set {} {} -> {}",

@@ -2,7 +2,9 @@ package io.github.mhokelvin.createrecipepicker.network;
 
 import io.github.mhokelvin.createrecipepicker.CreateRecipePicker;
 import io.github.mhokelvin.createrecipepicker.RecipePickerState;
+import net.minecraft.ChatFormatting;
 import net.minecraft.network.FriendlyByteBuf;
+import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraftforge.network.NetworkEvent;
@@ -29,7 +31,12 @@ public record ClearPreferencePacket(
         ctx.enqueueWork(() -> {
             ServerPlayer sender = ctx.getSender();
             if (sender == null) return;
-            // See SetPreferencePacket for the permission-check rationale.
+            if (!sender.server.isSingleplayer() && !sender.hasPermissions(2)) {
+                sender.sendSystemMessage(Component.literal(
+                        "Recipe Picker: only operators can change preferences on this server")
+                        .withStyle(ChatFormatting.RED));
+                return;
+            }
             RecipePickerState state = RecipePickerState.get(sender.server.overworld());
             state.clearPreference(pkt.typeId, pkt.inputItemId);
             CreateRecipePicker.LOGGER.info("[{}] cleared {} {}",

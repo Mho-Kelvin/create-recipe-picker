@@ -257,11 +257,28 @@ public class RecipePickerScreen extends Screen {
         int iconX = pillX + PILL_PAD_X;
         for (ConflictScanner.OutputEntry e : outputs) {
             if (iconX + ICON_SIZE > pillX + pillW - PILL_PAD_X) break;
-            // Chance outputs render identically to guaranteed outputs for now — the
-            // percentage is in the tooltip only. See project memory "chance-output-visual".
+            if (e.chance() < 1f) {
+                renderChanceSlot(g, iconX, iconY);
+            }
             g.renderItem(e.stack(), iconX, iconY);
             g.renderItemDecorations(font, e.stack(), iconX, iconY);
             iconX += ICON_SIZE + OUTPUT_GAP;
+        }
+    }
+
+    private static final int CHECKER_BRASS = 0xc0_6d4c18;
+    private static final int CHECKER_CELL = 4;
+    private static final int CHANCE_SLOT_SIZE = ICON_SIZE;
+    private static final int CHECKER_CELLS_PER_SIDE = CHANCE_SLOT_SIZE / CHECKER_CELL;
+
+    private static void renderChanceSlot(GuiGraphics g, int iconX, int iconY) {
+        for (int row = 0; row < CHECKER_CELLS_PER_SIDE; row++) {
+            for (int col = 0; col < CHECKER_CELLS_PER_SIDE; col++) {
+                if ((row + col) % 2 != 0) continue;
+                int x = iconX + col * CHECKER_CELL;
+                int y = iconY + row * CHECKER_CELL;
+                g.fill(x, y, x + CHECKER_CELL, y + CHECKER_CELL, CHECKER_BRASS);
+            }
         }
     }
 
